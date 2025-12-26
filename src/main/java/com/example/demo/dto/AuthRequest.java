@@ -1,20 +1,23 @@
 package com.example.demo.dto;
 
-import lombok.Data;
-
-@Data
 public class AuthRequest {
-    private String email;
+
+    private String username;
     private String password;
-}
-dto/AuthResponse.java
-package com.example.demo.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
+    public String getUsername() {
+        return username;
+    }
 
-@Data
-@AllArgsConstructor
-public class AuthResponse {
-    private String token;
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
 }
