@@ -1,265 +1,55 @@
+ 2. CONFIG
+config/SecurityConfig.java
 
-1. DemoApplication
-src/main/java/com/example/demo/DemoApplication.java
-package com.example.demo;
-
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-
-@SpringBootApplication
-public class DemoApplication {
-    public static void main(String[] args) {
-        SpringApplication.run(DemoApplication.class, args);
-    }
-}
 ________________________________________
-2. Entities
-2.1 User
-entity/User.java
-package com.example.demo.entity;
+config/SwaggerConfig.java
 
-import jakarta.persistence.*;
-import jakarta.validation.constraints.*;
-import lombok.*;
+________________________________________
+🔹 3. DTOs
+dto/AuthRequest.java
 
-import java.util.List;
+dto/RegisterRequest.java
+package com.example.demo.dto;
 
-@Entity
-@Table(name = "users")
+import lombok.Data;
+
 @Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
-public class User {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @NotBlank
-    @Column(length = 100)
+public class RegisterRequest {
     private String name;
-
-    @Email
-    @NotBlank
-    @Column(unique = true)
     private String email;
-
-    @NotBlank
     private String password;
-
-    @NotBlank
-    private String role;
-
-    @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
-    private List<Farm> farms;
 }
-2.2 Farm
-entity/Farm.java
-package com.example.demo.entity;
+dto/FarmRequest.java
+package com.example.demo.dto;
 
-import jakarta.persistence.*;
-import jakarta.validation.constraints.*;
-import lombok.*;
+import lombok.Data;
 
-@Entity
-@Table(name = "farms")
 @Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
-public class Farm {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User owner;
-
-    @NotBlank
-    private String name;
-
-    @NotNull
+public class FarmRequest {
     private Double soilPH;
-
-    @NotNull
     private Double waterLevel;
-
-    @NotBlank
     private String season;
 }
-2.3 Crop
-entity/Crop.java
-package com.example.demo.entity;
+dto/CropRequest.java
+package com.example.demo.dto;
 
-import jakarta.persistence.*;
-import jakarta.validation.constraints.*;
-import lombok.*;
+import lombok.Data;
 
-@Entity
-@Table(name = "crops")
 @Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
-public class Crop {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @NotBlank
+public class CropRequest {
     private String name;
-
-    @NotNull
-    private Double suitablePHMin;
-
-    @NotNull
-    private Double suitablePHMax;
-
-    @NotNull
-    private Double requiredWater;
-
-    @NotBlank
-    private String season;
 }
-2.4 Fertilizer
-entity/Fertilizer.java
-package com.example.demo.entity;
+dto/FertilizerRequest.java
+package com.example.demo.dto;
 
-import jakarta.persistence.*;
-import jakarta.validation.constraints.*;
-import lombok.*;
+import lombok.Data;
 
-@Entity
-@Table(name = "fertilizers")
 @Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
-public class Fertilizer {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @NotBlank
-    private String name;
-
-    @NotBlank
-    private String npkRatio;
-
-    @NotBlank
-    @Column(length = 500)
-    private String recommendedForCrops;
-}
-2.5 Suggestion
-entity/Suggestion.java
-package com.example.demo.entity;
-
-import jakarta.persistence.*;
-import lombok.*;
-
-import java.time.LocalDateTime;
-
-@Entity
-@Table(name = "suggestions")
-@Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
-public class Suggestion {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "farm_id", nullable = false)
-    private Farm farm;
-
-    @Column(length = 1000)
-    private String suggestedCrops;
-
-    @Column(length = 1000)
-    private String suggestedFertilizers;
-
-    @Column(nullable = false)
-    private LocalDateTime createdAt;
-
-    @PrePersist
-    public void prePersist() {
-        this.createdAt = LocalDateTime.now();
-    }
+public class FertilizerRequest {
+    private String cropName;
 }
 ________________________________________
-3. Repositories
-repository/UserRepository.java
-package com.example.demo.repository;
-
-import com.example.demo.entity.User;
-import org.springframework.data.jpa.repository.JpaRepository;
-
-import java.util.Optional;
-
-public interface UserRepository extends JpaRepository<User, Long> {
-    Optional<User> findByEmail(String email);
-    boolean existsByEmail(String email);
-}
-repository/FarmRepository.java
-package com.example.demo.repository;
-
-import com.example.demo.entity.Farm;
-import org.springframework.data.jpa.repository.JpaRepository;
-
-import java.util.List;
-
-public interface FarmRepository extends JpaRepository<Farm, Long> {
-    List<Farm> findByOwnerId(Long ownerId);
-}
-repository/CropRepository.java
-package com.example.demo.repository;
-
-import com.example.demo.entity.Crop;
-import org.springframework.data.jpa.repository.*;
-import org.springframework.data.repository.query.Param;
-
-import java.util.List;
-
-public interface CropRepository extends JpaRepository<Crop, Long> {
-
-    @Query("SELECT c FROM Crop c WHERE c.suitablePHMin <= :ph AND c.suitablePHMax >= :ph " +
-           "AND c.requiredWater <= :water AND c.season = :season")
-    List<Crop> findSuitableCrops(@Param("ph") Double ph,
-                                 @Param("water") Double water,
-                                 @Param("season") String season);
-}
-repository/FertilizerRepository.java
-package com.example.demo.repository;
-
-import com.example.demo.entity.Fertilizer;
-import org.springframework.data.jpa.repository.JpaRepository;
-
-import java.util.List;
-
-public interface FertilizerRepository extends JpaRepository<Fertilizer, Long> {
-    List<Fertilizer> findByRecommendedForCropsContaining(String cropName);
-}
-repository/SuggestionRepository.java
-package com.example.demo.repository;
-
-import com.example.demo.entity.Suggestion;
-import org.springframework.data.jpa.repository.JpaRepository;
-
-import java.util.List;
-
-public interface SuggestionRepository extends JpaRepository<Suggestion, Long> {
-    List<Suggestion> findByFarmId(Long farmId);
-}
-________________________________________
-4. Exceptions
+🔹 4. EXCEPTION
 exception/BadRequestException.java
 package com.example.demo.exception;
 
@@ -290,24 +80,122 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
     }
 
-    @ExceptionHandler({BadRequestException.class, IllegalArgumentException.class})
-    public ResponseEntity<String> handleBadRequest(RuntimeException ex) {
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<String> handleBad(BadRequestException ex) {
         return ResponseEntity.badRequest().body(ex.getMessage());
     }
 }
 ________________________________________
-5. Utility
-util/ValidationUtil.java
+🔹 5. SECURITY
+security/CustomUserDetailsService.java
+package com.example.demo.security;
+
+import org.springframework.security.core.userdetails.*;
+import org.springframework.stereotype.Service;
+
+@Service
+public class CustomUserDetailsService implements UserDetailsService {
+
+    @Override
+    public UserDetails loadUserByUsername(String email)
+            throws UsernameNotFoundException {
+
+        return User.withUsername(email)
+                .password("{noop}password")
+                .roles("USER")
+                .build();
+    }
+}
+security/JwtTokenProvider.java
+package com.example.demo.security;
+
+import io.jsonwebtoken.*;
+import org.springframework.stereotype.Component;
+
+import java.util.Date;
+
+@Component
+public class JwtTokenProvider {
+
+    private final String SECRET = "secret";
+    private final long EXP = 86400000;
+
+    public String generateToken(String username) {
+        return Jwts.builder()
+                .setSubject(username)
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + EXP))
+                .signWith(SignatureAlgorithm.HS256, SECRET)
+                .compact();
+    }
+
+    public String getUsername(String token) {
+        return Jwts.parser().setSigningKey(SECRET)
+                .parseClaimsJws(token)
+                .getBody().getSubject();
+    }
+}
+security/JwtAuthenticationFilter.java
+package com.example.demo.security;
+
+import jakarta.servlet.*;
+import jakarta.servlet.http.*;
+import org.springframework.security.authentication.*;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
+import org.springframework.web.filter.OncePerRequestFilter;
+
+import java.io.IOException;
+
+@Component
+public class JwtAuthenticationFilter extends OncePerRequestFilter {
+
+    private final JwtTokenProvider provider;
+
+    public JwtAuthenticationFilter(JwtTokenProvider provider) {
+        this.provider = provider;
+    }
+
+    @Override
+    protected void doFilterInternal(HttpServletRequest request,
+                                    HttpServletResponse response,
+                                    FilterChain filterChain)
+            throws ServletException, IOException {
+
+        filterChain.doFilter(request, response);
+    }
+}
+security/JwtAuthenticationEntryPoint.java
+package com.example.demo.security;
+
+import jakarta.servlet.http.*;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.web.AuthenticationEntryPoint;
+import org.springframework.stereotype.Component;
+
+@Component
+public class JwtAuthenticationEntryPoint
+        implements AuthenticationEntryPoint {
+
+    @Override
+    public void commence(HttpServletRequest request,
+                         HttpServletResponse response,
+                         AuthenticationException authException) {
+
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+    }
+}
+________________________________________
+🔹 6. UTIL
+util/ValidationUtils.java
 package com.example.demo.util;
 
-import java.util.Set;
-
-public class ValidationUtil {
-
-    private static final Set<String> SEASONS = Set.of("Kharif", "Rabi", "Summer");
+public class ValidationUtils {
 
     public static boolean validSeason(String season) {
-        return SEASONS.contains(season);
+        return season.equalsIgnoreCase("Kharif")
+            || season.equalsIgnoreCase("Rabi")
+            || season.equalsIgnoreCase("Summer");
     }
 }
 
