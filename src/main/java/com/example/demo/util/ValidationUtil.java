@@ -1,111 +1,11 @@
- 2. CONFIG
-config/SecurityConfig.java
-
-________________________________________
-config/SwaggerConfig.java
-
-________________________________________
-🔹 3. DTOs
-dto/AuthRequest.java
-
-dto/RegisterRequest.java
-package com.example.demo.dto;
-
-import lombok.Data;
-
-@Data
-public class RegisterRequest {
-    private String name;
-    private String email;
-    private String password;
-}
-dto/FarmRequest.java
-package com.example.demo.dto;
-
-import lombok.Data;
-
-@Data
-public class FarmRequest {
-    private Double soilPH;
-    private Double waterLevel;
-    private String season;
-}
-dto/CropRequest.java
-package com.example.demo.dto;
-
-import lombok.Data;
-
-@Data
-public class CropRequest {
-    private String name;
-}
-dto/FertilizerRequest.java
-package com.example.demo.dto;
-
-import lombok.Data;
-
-@Data
-public class FertilizerRequest {
-    private String cropName;
-}
-________________________________________
 🔹 4. EXCEPTION
 exception/BadRequestException.java
-package com.example.demo.exception;
 
-public class BadRequestException extends RuntimeException {
-    public BadRequestException(String message) {
-        super(message);
-    }
-}
-exception/ResourceNotFoundException.java
-package com.example.demo.exception;
-
-public class ResourceNotFoundException extends RuntimeException {
-    public ResourceNotFoundException(String message) {
-        super(message);
-    }
-}
 exception/GlobalExceptionHandler.java
-package com.example.demo.exception;
-
-import org.springframework.http.*;
-import org.springframework.web.bind.annotation.*;
-
-@RestControllerAdvice
-public class GlobalExceptionHandler {
-
-    @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<String> handleNotFound(ResourceNotFoundException ex) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
-    }
-
-    @ExceptionHandler(BadRequestException.class)
-    public ResponseEntity<String> handleBad(BadRequestException ex) {
-        return ResponseEntity.badRequest().body(ex.getMessage());
-    }
-}
-________________________________________
+_____________________________________
 🔹 5. SECURITY
 security/CustomUserDetailsService.java
-package com.example.demo.security;
 
-import org.springframework.security.core.userdetails.*;
-import org.springframework.stereotype.Service;
-
-@Service
-public class CustomUserDetailsService implements UserDetailsService {
-
-    @Override
-    public UserDetails loadUserByUsername(String email)
-            throws UsernameNotFoundException {
-
-        return User.withUsername(email)
-                .password("{noop}password")
-                .roles("USER")
-                .build();
-    }
-}
 security/JwtTokenProvider.java
 package com.example.demo.security;
 

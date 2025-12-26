@@ -1,28 +1,8 @@
-package com.example.demo.entity;
+package com.example.demo.dto;
 
-import jakarta.persistence.*;
-import jakarta.validation.constraints.*;
-import lombok.*;
+import lombok.Data;
 
-@Entity
-@Table(name = "fertilizers")
 @Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
-public class Fertilizer {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @NotBlank
-    private String name;
-
-    @NotBlank
-    private String npkRatio;
-
-    @NotBlank
-    @Column(length = 500)
-    private String recommendedForCrops;
+public class FertilizerRequest {
+    private String cropName;
 }
