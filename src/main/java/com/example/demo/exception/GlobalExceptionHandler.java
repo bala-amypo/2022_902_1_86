@@ -15,5 +15,4 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleBad(BadRequestException ex) {
         return ResponseEntity.badRequest().body(ex.getMessage());
     }
-}
-___
+}__
