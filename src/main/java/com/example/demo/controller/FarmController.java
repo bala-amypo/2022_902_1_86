@@ -7,23 +7,24 @@ import com.example.demo.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/farms")
 public class FarmController {
-    
+
     private final FarmService farmService;
     private final UserService userService;
-    
+
     public FarmController(FarmService farmService, UserService userService) {
         this.farmService = farmService;
         this.userService = userService;
     }
-    
+
     @PostMapping
-    public ResponseEntity<Farm> createFarm(@RequestBody FarmRequest request, Authentication auth) {
-        Long userId = (Long) auth.getPrincipal();
+    public ResponseEntity<Farm> createFarm(@RequestBody FarmRequest request, Authentication authentication) {
+        Long userId = (Long) authentication.getPrincipal();
         
         Farm farm = Farm.builder()
                 .name(request.getName())
@@ -35,14 +36,14 @@ public class FarmController {
         Farm savedFarm = farmService.createFarm(farm, userId);
         return ResponseEntity.ok(savedFarm);
     }
-    
+
     @GetMapping
-    public ResponseEntity<List<Farm>> listFarms(Authentication auth) {
-        Long userId = (Long) auth.getPrincipal();
+    public ResponseEntity<List<Farm>> listFarms(Authentication authentication) {
+        Long userId = (Long) authentication.getPrincipal();
         List<Farm> farms = farmService.getFarmsByOwner(userId);
         return ResponseEntity.ok(farms);
     }
-    
+
     @GetMapping("/{id}")
     public ResponseEntity<Farm> getFarm(@PathVariable Long id) {
         Farm farm = farmService.getFarmById(id);

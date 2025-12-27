@@ -9,14 +9,17 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class SwaggerConfig {
-    
+
     @Bean
     public OpenAPI api() {
         return new OpenAPI()
-                .info(new Info().title("Farm Management API").version("1.0"))
+                .info(new Info()
+                        .title("Crop & Fertilizer Suggestion API")
+                        .description("API for managing farms and generating crop suggestions")
+                        .version("1.0"))
                 .addSecurityItem(new SecurityRequirement().addList("Bearer Authentication"))
                 .components(new io.swagger.v3.oas.models.Components()
-                        .addSecuritySchemes("Bearer Authentication", 
+                        .addSecuritySchemes("Bearer Authentication",
                                 new SecurityScheme()
                                         .type(SecurityScheme.Type.HTTP)
                                         .scheme("bearer")
