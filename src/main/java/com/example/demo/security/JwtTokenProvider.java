@@ -15,6 +15,7 @@ public class JwtTokenProvider {
     private final Key key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
     private final long jwtExpirationMs = 86400000; // 1 day
 
+    // ✅ USED BY AuthController
     public String generateToken(String email) {
         return Jwts.builder()
                 .setSubject(email)
