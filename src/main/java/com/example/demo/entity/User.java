@@ -1,7 +1,14 @@
 package com.example.demo.entity;
 
 import jakarta.persistence.*;
-import lombok.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 @Entity
 @Table(name = "users")
@@ -13,16 +20,23 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
-    @Column(unique = true, nullable = false)
-    private String email;
-    
-    @Column(nullable = false)
+
+    @NotBlank
+    @Column(length = 100)
     private String name;
-    
-    @Column(nullable = false)
+
+    @Email
+    @NotBlank
+    @Column(unique = true)
+    private String email;
+
+    @NotBlank
     private String password;
-    
-    @Column(nullable = false)
-    private String role;
+
+    @NotBlank
+    @Builder.Default
+    private String role = "USER";
+
+    @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
+    private List<Farm> farms;
 }
