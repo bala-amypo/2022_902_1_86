@@ -5,7 +5,6 @@ import java.util.List;
 
 public interface FarmService {
     Farm createFarm(Farm farm, Long ownerId);
-    Farm getFarmById(Long id);
     List<Farm> getFarmsByOwner(Long ownerId);
+    Farm getFarmById(Long farmId);
 }
-
