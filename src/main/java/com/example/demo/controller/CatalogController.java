@@ -2,7 +2,6 @@ package com.example.demo.controller;
 
 import com.example.demo.entity.Crop;
 import com.example.demo.service.CatalogService;
-import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,8 +25,6 @@ public class CatalogController {
             @RequestParam Double requiredWater,
             @RequestParam String season
     ) {
-
-        // ✅ NO Lombok builder — using constructor
         Crop crop = new Crop(
                 null,
                 name,
@@ -37,8 +34,7 @@ public class CatalogController {
                 season
         );
 
-        Crop savedCrop = catalogService.saveCrop(crop);
-        return ResponseEntity.ok(savedCrop);
+        return ResponseEntity.ok(catalogService.saveCrop(crop));
     }
 
     @GetMapping("/crops")
