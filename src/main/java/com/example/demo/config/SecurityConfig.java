@@ -31,33 +31,6 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 }
-
-
-service
-
-
-validation
-package com.example.demo.util;
-public class ValidationUtil {
-    public static boolean validSeason(String season) {
-        if (season == null) return false;
-        return season.equalsIgnoreCase("Kharif") || 
-               season.equalsIgnoreCase("Rabi") || 
-               season.equalsIgnoreCase("Summer");
-    }
-}
-demo
-package com.example.demo;
-
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-
-@SpringBootApplication
-public class DemoApplication {
-    public static void main(String[] args) {
-        SpringApplication.run(DemoApplication.class, args);
-    }
-}
 application properties
 spring.application.name=demo
 # Don't change the port
