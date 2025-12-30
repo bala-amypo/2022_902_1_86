@@ -1,50 +1,44 @@
 package com.example.demo.service.impl;
 
 import com.example.demo.entity.Crop;
+import com.example.demo.entity.Fertilizer;
 import com.example.demo.repository.CropRepository;
+import com.example.demo.repository.FertilizerRepository;
 import com.example.demo.service.CatalogService;
+
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class CatalogServiceImpl implements CatalogService {
 
     private final CropRepository cropRepository;
+    private final FertilizerRepository fertilizerRepository;
 
-    public CatalogServiceImpl(CropRepository cropRepository) {
+    public CatalogServiceImpl(CropRepository cropRepository,
+                              FertilizerRepository fertilizerRepository) {
         this.cropRepository = cropRepository;
+        this.fertilizerRepository = fertilizerRepository;
     }
 
     @Override
-    public Crop saveCrop(Crop crop) {
-        return cropRepository.save(crop);
-    }
+    public List<Fertilizer> findFertilizersForCrops(List<String> cropNames) {
 
-    @Override
-    public List<Crop> getAllCrops() {
-        return cropRepository.findAll();
-    }
+        List<Fertilizer> result = new ArrayList<>();
 
-    @Override
-    public List<Crop> findSuitableCrops(Double soilPH, Double waterAvailable, String season) {
-        return cropRepository.findAll()
-                .stream()
-                .filter(crop ->
-                        soilPH >= crop.getSuitablePHMin()
-                                && soilPH <= crop.getSuitablePHMax()
-                                && crop.getSeason().equalsIgnoreCase(season)
-                                && waterAvailable >= crop.getRequiredWater()
-                )
-                .collect(Collectors.toList());
-    }
+        for (String cropName : cropNames) {
+            Crop crop = cropRepository.findByName(cropName);
 
-    @Override
-    public List<String> findFertilizersForCrops(List<String> cropNames) {
-        // SIMPLE placeholder logic (can be improved later)
-        return cropNames.stream()
-                .map(crop -> crop + " Fertilizer")
-                .collect(Collectors.toList());
+            if (crop != null) {
+                List<Fertilizer> fertilizers =
+                        fertilizerRepository.findByCrop(crop);
+
+                result.addAll(fertilizers);
+            }
+        }
+
+        return result;
     }
 }
