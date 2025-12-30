@@ -23,4 +23,4 @@ public class CropRequest {
     public Double getSuitablePHMax() { return suitablePHMax; }
     public Double getRequiredWater() { return requiredWater; }
     public String getSeason() { return season; }
-}
+} 
